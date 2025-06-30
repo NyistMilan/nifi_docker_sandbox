@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  nifi:
+    image: my-nifi:custom
+    container_name: nifi
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    environment:
+      NIFI_WEB_HTTP_HOST: "0.0.0.0"
+      NIFI_WEB_HTTP_PORT: "8443"
+      SINGLE_USER_CREDENTIALS_USERNAME: admin
+      SINGLE_USER_CREDENTIALS_PASSWORD: AdminAdmin123.
+      NIFI_SENSITIVE_PROPS_KEY: "ChangeMe123!"
+    volumes:
+      - nifi_data:/opt/nifi/nifi-current/data
+      - nifi_conf:/opt/nifi/nifi-current/conf
+    networks:
+      - nifi_net
+
+  db:
+    image: postgres:14
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "nifi_db"
+      POSTGRES_USER: "nifiuser"
+      POSTGRES_PASSWORD: "nifipass"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - nifi_net
+
+volumes:
+  nifi_data:
+  nifi_conf:
+  db_data:
+
+networks:
+  nifi_net:
+    driver: bridge
